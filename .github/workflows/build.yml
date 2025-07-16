@@ -15,12 +15,20 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-11-jdk unzip zip
+          sudo apt install -y python3-pip openjdk-11-jdk unzip zip libncurses5 libstdc++6 libffi-dev libssl-dev libtool pkg-config
+          pip3 install --upgrade pip
           pip3 install buildozer Cython
 
-      - name: Build APK
+      - name: Accept Android SDK Licenses
         run: |
-          buildozer android debug
+          mkdir -p ~/.android
+          echo '8933bad161af4178b1185d1a37fbf41ea5269c55' > ~/.android/repositories.cfg
+
+      - name: Clean Buildozer (optional)
+        run: buildozer android clean || true
+
+      - name: Build APK
+        run: buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
