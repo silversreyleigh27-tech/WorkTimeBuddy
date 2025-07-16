@@ -15,20 +15,28 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-11-jdk unzip zip libstdc++6 libffi-dev libssl-dev libtool pkg-config
+          sudo apt install -y python3-pip openjdk-11-jdk unzip zip curl git libstdc++6 libffi-dev libssl-dev libtool pkg-config
           pip3 install --upgrade pip
           pip3 install buildozer Cython
 
-      - name: Accept Android SDK Licenses
+      - name: Download commandlinetools and accept licenses
         run: |
-          mkdir -p ~/.android
-          echo '8933bad161af4178b1185d1a37fbf41ea5269c55' > ~/.android/repositories.cfg
-
-      - name: Clean Buildozer (optional)
-        run: buildozer android clean || true
+          mkdir -p $HOME/.android
+          echo "### license workaround ###"
+          mkdir -p sdk-tools
+          cd sdk-tools
+          curl -o sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+          unzip sdk.zip
+          mkdir -p $HOME/cmdline-tools
+          mv cmdline-tools $HOME/cmdline-tools/tools
+          yes | $HOME/cmdline-tools/tools/bin/sdkmanager --sdk_root=${HOME}/android-sdk --licenses || true
+          yes | $HOME/cmdline-tools/tools/bin/sdkmanager --sdk_root=${HOME}/android-sdk "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+          echo "sdk.dir=$HOME/android-sdk" > local.properties
+          echo "### license accepted ###"
 
       - name: Build APK
-        run: buildozer -v android debug
+        run: |
+          buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
