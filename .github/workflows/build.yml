@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-11-jdk unzip zip libncurses5 libstdc++6 libffi-dev libssl-dev libtool pkg-config
+          sudo apt install -y python3-pip openjdk-11-jdk unzip zip libstdc++6 libffi-dev libssl-dev libtool pkg-config
           pip3 install --upgrade pip
           pip3 install buildozer Cython
 
